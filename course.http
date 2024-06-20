@@ -1,7 +1,7 @@
 @apiurl = http://localhost:3000
-@username = "teste5"
-@email = "teste5@gmail.com"
-@password = "Aa#12345"
+@username = "admin"
+@email = ""
+@password = "admin"
 
 GET {{apiurl}}/api/hello-world
 
@@ -20,10 +20,21 @@ Content-Type: application/json
 
 GET {{apiurl}}/api/user
 
+Authorization: Bearer ACCESS-TOKEN
+
 ###
 
 POST {{apiurl}}/api/jwt-auth/token
+Content-Type: application/json
+
+{
+  "username": {{username}},
+  "password": {{password}}
+}
 
 ###
 
 POST {{apiurl}}/api/jwt-auth/token/validate
+Content-Type: application/json
+
+Authorization: Bearer ACCESS-TOKEN

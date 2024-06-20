@@ -2,14 +2,26 @@ import { NextRequest, NextResponse } from "next/server";
 import { sql } from "@vercel/postgres";
 
 export async function GET(req = NextRequest()) {
-  try {
-    const { rows } = await sql`SELECT * FROM users LIMIT 100000`;
+  const bearerToken = req.headers.get("authorization");
+  const token = bearerToken.split(" ")[1];
 
-    return NextResponse.json(rows);
-  } catch (error) {
-    console.error("Erro ao recuperar dados dos usuários: ", error);
+  try {
+    const { rows } =
+      await sql`SELECT userid, username, email FROM jwt_tokens WHERE token = ${token}`;
+
+    const user = rows[0];
+
     return NextResponse.json(
-      { error: "Erro ao verificar banco de dados" },
+      {
+        ok: true,
+        statusText: "Consulta realizada com sucesso no banco de dados!",
+        user,
+      },
+      { status: 200 }
+    );
+  } catch (error) {
+    return NextResponse.json(
+      { statusText: "Erro ao verificar banco de dados" },
       { status: 500 }
     );
   }
@@ -21,7 +33,7 @@ export async function POST(req = NextRequest()) {
 
     if (!username || !email || !password) {
       return NextResponse.json(
-        { error: "Username, email e senha são obrigatórios" },
+        { statusText: "Username, email e senha são obrigatórios" },
         { status: 400 }
       );
     }
@@ -30,7 +42,7 @@ export async function POST(req = NextRequest()) {
 
     if (rows.length > 0) {
       return NextResponse.json(
-        { error: "Email já está cadastrado!" },
+        { statusText: "Email já está cadastrado!" },
         { status: 400 }
       );
     }
@@ -45,7 +57,7 @@ export async function POST(req = NextRequest()) {
 
     return NextResponse.json(
       {
-        ok: "OK!",
+        ok: true,
         message: `Conta criada com sucesso com o username: ${user.username}`,
       },
       { status: 201 }
@@ -53,7 +65,7 @@ export async function POST(req = NextRequest()) {
   } catch (error) {
     console.error("Erro ao criar usuário: ", error);
     return NextResponse.json(
-      { error: "Erro ao criar usuário!" },
+      { statusText: "Erro ao criar usuário!" },
       { status: 500 }
     );
   }

@@ -10,6 +10,8 @@
   },
   "dependencies": {
     "@vercel/postgres": "^0.8.0",
+    "jsonwebtoken": "^9.0.2",
+    "moment-timezone": "^0.5.45",
     "next": "14.2.4",
     "react": "^18",
     "react-dom": "^18"
