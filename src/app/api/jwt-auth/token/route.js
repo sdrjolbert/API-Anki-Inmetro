@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
 import { sql } from "@vercel/postgres";
 import moment from "moment-timezone";
+import * as dotenv from "dotenv";
+dotenv.config();
 
 const SECRET_KEY = process.env.JWT_SECRET;
 const TIMEZONE = "America/Sao_Paulo";
