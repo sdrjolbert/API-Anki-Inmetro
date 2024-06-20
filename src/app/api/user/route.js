@@ -58,7 +58,7 @@ export async function POST(req = NextRequest()) {
     return NextResponse.json(
       {
         ok: true,
-        message: `Conta criada com sucesso com o username: ${user.username}`,
+        statusText: `Conta criada com sucesso com o username: ${user.username}`,
       },
       { status: 201 }
     );
