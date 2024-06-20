@@ -1,18 +1,29 @@
-GET http://localhost:3000/api/hello-world
+@apiurl = http://localhost:3000
+@username = "teste5"
+@email = "teste5@gmail.com"
+@password = "Aa#12345"
+
+GET {{apiurl}}/api/hello-world
 
 ###
 
-POST http://localhost:3000/api/user
+POST {{apiurl}}/api/user
+Content-Type: application/json
 
-
-###
-
-GET http://localhost:3000/api/user
-
-###
-
-POST http://localhost:3000/api/jwt-auth/token
+{
+  "username": {{username}},
+  "email": {{email}},
+  "password": {{password}}
+}
 
 ###
 
-POST http://localhost:3000/api/jwt-auth/token/validate
+GET {{apiurl}}/api/user
+
+###
+
+POST {{apiurl}}/api/jwt-auth/token
+
+###
+
+POST {{apiurl}}/api/jwt-auth/token/validate
