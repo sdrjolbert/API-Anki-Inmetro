@@ -53,7 +53,7 @@ export async function POST(req = NextRequest()) {
     const createdAt = moment().tz(TIMEZONE).format();
     const expiresAt = moment.unix(jwt.decode(token).exp).format();
 
-    await sql`INSERT INTO jwt_tokens ( userid, username, email, token, expiresat, createdat ) VALUES ( ${user.id}, ${user.username}, ${user.email}, ${token}, ${expiresAt}, ${createdAt} )`;
+    await sql`INSERT INTO jwt_tokens ( userid, username, email, token, createdat, expiresat ) VALUES ( ${user.id}, ${user.username}, ${user.email}, ${token}, ${createdAt}, ${expiresAt} )`;
 
     return NextResponse.json(
       {
