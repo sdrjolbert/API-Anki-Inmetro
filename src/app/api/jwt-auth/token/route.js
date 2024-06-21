@@ -38,20 +38,29 @@ export async function POST(req = NextRequest()) {
       );
     }
 
+    const { rows: verifyIfUserHasToken } =
+      await sql`SELECT * FROM jwt_tokens WHERE userid = ${user.id} AND username = ${user.username} AND email = ${user.email}`;
+
+    if (verifyIfUserHasToken.length !== 0) {
+      await sql`DELETE FROM jwt_tokens WHERE userid = ${user.id} AND username = ${user.username} AND email = ${user.email}`;
+    }
+
     const payload = {
       username: user.username,
       password: user.password,
     };
-    const token = jwt.sign(payload, SECRET_KEY, { expiresIn: "365d" });
+    const token = jwt.sign(payload, SECRET_KEY, { expiresIn: "1h" });
+    const createdAt = moment().tz(TIMEZONE).format();
     const expiresAt = moment.unix(jwt.decode(token).exp).format();
 
-    await sql`INSERT INTO jwt_tokens ( userid, username, email, token, expiresat ) VALUES ( ${user.id}, ${user.username}, ${user.email}, ${token}, ${expiresAt} )`;
+    await sql`INSERT INTO jwt_tokens ( userid, username, email, token, expiresat, createdat ) VALUES ( ${user.id}, ${user.username}, ${user.email}, ${token}, ${expiresAt}, ${createdAt} )`;
 
     return NextResponse.json(
       {
         ok: true,
         statusText: "Token gerado com sucesso!",
         token,
+        createdAt,
         expiresAt,
       },
       { status: 200 }
