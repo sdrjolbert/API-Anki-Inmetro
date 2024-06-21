@@ -42,27 +42,20 @@ export async function POST(req = NextRequest()) {
       username: user.username,
       password: user.password,
     };
-    const token = jwt.sign(payload, SECRET_KEY, { expiresIn: "30d" });
+    const token = jwt.sign(payload, SECRET_KEY, { expiresIn: "365d" });
+    const expiresAt = moment.unix(jwt.decode(token).exp).format();
 
-    const expiresAtUTC = moment().add(30, "days");
-    const expiresAtLocal = expiresAtUTC.tz(TIMEZONE).format();
+    await sql`INSERT INTO jwt_tokens ( userid, username, email, token, expiresat ) VALUES ( ${user.id}, ${user.username}, ${user.email}, ${token}, ${expiresAt} )`;
 
     return NextResponse.json(
-      { token, expiresAtUTC, expiresAtLocal },
+      {
+        ok: true,
+        statusText: "Token gerado com sucesso!",
+        token,
+        expiresAt,
+      },
       { status: 200 }
     );
-
-    // await sql`INSERT INTO jwt_tokens ( userid, username, email, token, expiresat ) VALUES ( ${user.id}, ${user.username}, ${user.email}, ${token}, ${expiresAtLocal} )`;
-
-    // return NextResponse.json(
-    //   {
-    //     ok: true,
-    //     statusText: "Token gerado com sucesso!",
-    //     token,
-    //     expiresAtLocal,
-    //   },
-    //   { status: 200 }
-    // );
   } catch (err) {
     return NextResponse.json(
       { statusText: "Erro ao gerar token de autenticação: " + err },
