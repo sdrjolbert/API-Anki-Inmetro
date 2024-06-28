@@ -28,10 +28,8 @@ export async function POST(req = NextRequest()) {
           await fs.writeFile(outputFile, fileData);
         })
       );
-
-      console.log("Extração concluída com sucesso!");
     } catch (e) {
-      console.error(`Ocorreu um erro durante a extração: ${e}`);
+      throw new Error(e);
     }
   }
 
@@ -95,10 +93,10 @@ export async function POST(req = NextRequest()) {
 
     const dbPath = path.join(outputDir, "collection.anki21");
 
-    const data = await readDatabase(dbPath);
+    const deck = await readDatabase(dbPath);
 
     return NextResponse.json(
-      { success: "Arquivo .apkg extraído com sucesso!", data },
+      { success: "Arquivo .apkg extraído com sucesso!", deck },
       { status: 200 }
     );
   } catch (err) {
