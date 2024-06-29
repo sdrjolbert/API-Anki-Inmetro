@@ -85,7 +85,7 @@ export async function POST(req = NextRequest()) {
       "Content-Disposition": `attachment; filename="deck.apkg"`,
     };
 
-    return new Response(fileBuffer, { headers });
+    return new NextResponse(fileBuffer, { headers });
   } catch (err) {
     return NextResponse.json(
       { error: `Falha na criação do arquivo .apkg: ${err}` },
