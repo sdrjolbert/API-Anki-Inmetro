@@ -1,12 +1,13 @@
+// FIXME: Corrigir extração, ERRO: zip header
+
 import { NextRequest, NextResponse } from "next/server";
 import path from "path";
-import JSZip from "jszip";
 import fs from "fs-extra";
 import sqlite3 from "sqlite3";
+import JSZip, { file } from "jszip";
 
 export async function POST(req = NextRequest()) {
-  const formData = await req.formData();
-  const jsonFile = formData.get("json-file");
+  const jsonFile = await req.json();
 
   if (!jsonFile) {
     return NextResponse.json(
@@ -15,83 +16,84 @@ export async function POST(req = NextRequest()) {
     );
   }
 
-  const jsonData = await jsonFile.text();
-  const deckData = JSON.parse(jsonData);
+  const filename = JSON.parse(jsonFile.col[0].decks)[
+    Object.keys(JSON.parse(jsonFile.col[0].decks))[1]
+  ].name.replaceAll(" ", "_");
 
   const dbPath = path.join(process.cwd(), "collection.anki21");
 
-  async function createDatabase(dbPath, deckData) {
-    return new Promise((resolve, reject) => {
-      const db = new sqlite3.Database(dbPath, (err) => {
-        if (err) {
-          reject(err);
-        }
+  const db = new sqlite3.Database(dbPath);
 
-        db.serialize(() => {
-          for (const table in deckData) {
-            db.run(
-              `CREATE TABLE ${table} (${Object.keys(deckData[table][0]).join(
-                ", "
-              )})`
-            );
-            const stmt = db.prepare(
-              `INSERT INTO ${table} VALUES (${Object.keys(deckData[table][0])
+  const schemaPath = path.join(process.cwd(), "schema.sql");
+  const schemaSql = fs.readFileSync(schemaPath, "utf-8");
+
+  return new Promise((resolve, reject) => {
+    db.exec(schemaSql, (err) => {
+      if (err) {
+        db.close();
+        reject(
+          NextResponse.json(
+            { error: `Erro ao criar o schema do banco de dados: ${err}` },
+            { status: 500 }
+          )
+        );
+      } else {
+        const insertData = () => {
+          const { cards, col, graves, notes, revlog } = jsonFile;
+
+          const insert = (table, rows) => {
+            if (rows && rows.length) {
+              const keys = Object.keys(rows[0]).join(", ");
+              const placeholders = Object.keys(rows[0])
                 .map(() => "?")
-                .join(", ")})`
-            );
+                .join(", ");
+              const sql = `INSERT INTO ${table} (${keys}) VALUES (${placeholders})`;
 
-            for (const row of deckData[table]) {
-              stmt.run(Object.values(row));
+              db.serialize(() => {
+                const stmt = db.prepare(sql);
+                rows.forEach((row) => stmt.run(Object.values(row)));
+                stmt.finalize();
+              });
             }
+          };
 
-            stmt.finalize();
-          }
+          insert("cards", cards);
+          insert("col", col);
+          insert("graves", graves);
+          insert("notes", notes);
+          insert("revlog", revlog);
 
-          db.close((err) => {
-            if (err) {
-              reject(err);
-            } else {
-              resolve();
+          db.close(async () => {
+            try {
+              const zip = new JSZip();
+              zip.file("collection.anki21", fs.readFileSync(dbPath));
+
+              const content = await zip.generateAsync({ type: "nodebuffer" });
+
+              fs.unlinkSync(dbPath);
+
+              const response = new NextResponse(content, {
+                headers: {
+                  "Content-Type": "application/zip",
+                  "Content-Disposition": `attachment; filename="${filename}.apkg"`,
+                  "X-Filename": filename,
+                },
+              });
+
+              resolve(response);
+            } catch (zipError) {
+              reject(
+                NextResponse.json(
+                  { error: `Erro ao criar o arquivo .apkg: ${zipError}` },
+                  { status: 500 }
+                )
+              );
             }
           });
-        });
-      });
+        };
+
+        insertData();
+      }
     });
-  }
-
-  async function createAPKG(dbPath) {
-    const zip = new JSZip();
-    const buffer = await fs.readFile(dbPath);
-
-    zip.file("collection.anki21", buffer);
-
-    const outputDir = path.join(process.cwd(), "output");
-    await fs.ensureDir(outputDir);
-
-    const apkgPath = path.join(outputDir, "deck.apkg");
-    const content = await zip.generateAsync({ type: "nodebuffer" });
-    await fs.writeFile(apkgPath, content);
-
-    return apkgPath;
-  }
-
-  try {
-    await createDatabase(dbPath, deckData);
-    const apkgPath = await createAPKG(dbPath);
-
-    const fileBuffer = await fs.readFile(apkgPath);
-    const headers = {
-      "Content-Type": "application/octet-stream",
-      "Content-Disposition": `attachment; filename="deck.apkg"`,
-    };
-
-    return new NextResponse(fileBuffer, { headers });
-  } catch (err) {
-    return NextResponse.json(
-      { error: `Falha na criação do arquivo .apkg: ${err}` },
-      { status: 500 }
-    );
-  } finally {
-    await fs.remove(dbPath);
-  }
+  });
 }

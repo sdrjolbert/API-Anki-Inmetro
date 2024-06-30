@@ -50,9 +50,13 @@ export async function POST(req = NextRequest()) {
           }
 
           const data = {};
+          const filteredTables = tables.filter(
+            (table) =>
+              table.name !== "sqlite_stat1" && table.name !== "sqlite_stat4"
+          );
 
           Promise.all(
-            tables.map(
+            filteredTables.map(
               (table) =>
                 new Promise((resolve, reject) => {
                   db.all(`SELECT * FROM ${table.name}`, [], (err, rows) => {
@@ -96,7 +100,11 @@ export async function POST(req = NextRequest()) {
     const deck = await readDatabase(dbPath);
 
     return NextResponse.json(
-      { success: "Arquivo .apkg extraído com sucesso!", deck },
+      {
+        success: "Arquivo .apkg extraído com sucesso!",
+        filename: apkgFile.name.split(".apkg")[0],
+        deck,
+      },
       { status: 200 }
     );
   } catch (err) {
