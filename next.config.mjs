@@ -28,12 +28,17 @@ const nextConfig = {
     return [
       {
         source: "/",
-        destination: "/api/hello-world",
+        destination: "/api/rotas",
+        permanent: true,
+      },
+      {
+        source: "/api/apkg/",
+        destination: "/api/apkg/import",
         permanent: true,
       },
       {
         source: "/api/deck/",
-        destination: "/api/deck/import",
+        destination: "/api/apkg/get-deck",
         permanent: true,
       },
     ];
