@@ -20,15 +20,17 @@ export async function POST(req = NextRequest()) {
       await sql`DELETE FROM jwt_tokens WHERE token = ${token}`;
 
       return NextResponse.json(
-        { statusText: "Token expirado! Gere um novo fazendo login novamente!" },
-        { status: 401 }
+        { error: "Token expirado! Gere um novo fazendo login novamente!" },
+        {
+          status: 401,
+          statusText: "Token expirado! Gere um novo fazendo login novamente!",
+        }
       );
     }
 
     return NextResponse.json(
       {
-        ok: "OK",
-        statusText: "Token válido!",
+        success: "Token válido!",
       },
       { status: 200 }
     );
@@ -36,8 +38,8 @@ export async function POST(req = NextRequest()) {
     await sql`DELETE FROM jwt_tokens WHERE token = ${token}`;
 
     return NextResponse.json(
-      { statusText: "Token inválido!" },
-      { statusCode: 400 }
+      { error: "Token inválido!" },
+      { statusCode: 400, statusText: "Token inválido!" }
     );
   }
 }

@@ -13,16 +13,15 @@ export async function GET(req = NextRequest()) {
 
     return NextResponse.json(
       {
-        ok: true,
-        statusText: "Consulta realizada com sucesso no banco de dados!",
+        success: "Consulta realizada com sucesso no banco de dados!",
         user,
       },
       { status: 200 }
     );
   } catch (error) {
     return NextResponse.json(
-      { statusText: "Erro ao verificar banco de dados" },
-      { status: 500 }
+      { error: "Erro ao verificar banco de dados" },
+      { status: 500, statusText: "Erro ao verificar banco de dados" }
     );
   }
 }
@@ -33,8 +32,8 @@ export async function POST(req = NextRequest()) {
 
     if (!username || !email || !password) {
       return NextResponse.json(
-        { statusText: "Username, email e senha são obrigatórios" },
-        { status: 400 }
+        { error: "Username, email e senha são obrigatórios" },
+        { status: 400, statusText: "Username, email e senha são obrigatórios" }
       );
     }
 
@@ -42,8 +41,8 @@ export async function POST(req = NextRequest()) {
 
     if (rows.length > 0) {
       return NextResponse.json(
-        { statusText: "Email já está cadastrado!" },
-        { status: 400 }
+        { error: "Email já está cadastrado!" },
+        { status: 400, statusText: "Email já está cadastrado!" }
       );
     }
 
@@ -57,16 +56,15 @@ export async function POST(req = NextRequest()) {
 
     return NextResponse.json(
       {
-        ok: true,
-        statusText: `Conta criada com sucesso com o username: ${user.username}`,
+        success: `Conta criada com sucesso com o username: ${user.username}`,
       },
       { status: 201 }
     );
   } catch (error) {
     console.error("Erro ao criar usuário: ", error);
     return NextResponse.json(
-      { statusText: "Erro ao criar usuário!" },
-      { status: 500 }
+      { error: "Erro ao criar usuário!" },
+      { status: 500, statusText: "Erro ao criar usuário!" }
     );
   }
 }

@@ -10,15 +10,14 @@ export async function POST(req = NextRequest()) {
 
     return NextResponse.json(
       {
-        ok: "OK",
-        statusText: "Token removido com sucesso!",
+        success: "Token removido com sucesso!",
       },
       { status: 200 }
     );
   } catch (err) {
     return NextResponse.json(
-      { statusText: "Não foi possível remover o token!" },
-      { statusCode: 400 }
+      { error: "Não foi possível remover o token!" },
+      { statusCode: 400, statusText: "Não foi possível remover o token!" }
     );
   }
 }

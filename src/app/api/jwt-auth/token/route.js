@@ -14,8 +14,8 @@ export async function POST(req = NextRequest()) {
 
     if (!username || !password) {
       return NextResponse.json(
-        { statusText: "Username e senha são obrigatórios" },
-        { status: 400 }
+        { error: "Username e senha são obrigatórios" },
+        { status: 400, statusText: "Username e senha são obrigatórios" }
       );
     }
 
@@ -24,8 +24,8 @@ export async function POST(req = NextRequest()) {
 
     if (rows.length === 0) {
       return NextResponse.json(
-        { statusText: "Usuário não encontrado!" },
-        { status: 404 }
+        { error: "Usuário não encontrado!" },
+        { status: 404, statusText: "Usuário não encontrado!" }
       );
     }
 
@@ -33,8 +33,8 @@ export async function POST(req = NextRequest()) {
 
     if (user.password != password) {
       return NextResponse.json(
-        { statusText: "Senha incorreta!" },
-        { status: 401 }
+        { error: "Senha incorreta!" },
+        { status: 401, statusText: "Senha incorreta!" }
       );
     }
 
@@ -57,8 +57,7 @@ export async function POST(req = NextRequest()) {
 
     return NextResponse.json(
       {
-        ok: true,
-        statusText: "Token gerado com sucesso!",
+        success: "Token gerado com sucesso!",
         token,
         createdAt,
         expiresAt,
@@ -67,8 +66,8 @@ export async function POST(req = NextRequest()) {
     );
   } catch (err) {
     return NextResponse.json(
-      { statusText: "Erro ao gerar token de autenticação: " + err },
-      { status: 400 }
+      { error: "Erro ao gerar token de autenticação: " + err },
+      { status: 400, statusText: "Erro ao gerar token de autenticação: " + err }
     );
   }
 }
