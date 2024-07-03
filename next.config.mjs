@@ -31,6 +31,11 @@ const nextConfig = {
         destination: "/api/hello-world",
         permanent: true,
       },
+      {
+        source: "/api/deck/",
+        destination: "/api/deck/import",
+        permanent: true,
+      },
     ];
   },
 };

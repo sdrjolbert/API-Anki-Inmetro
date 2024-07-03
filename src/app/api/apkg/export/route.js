@@ -1,10 +1,8 @@
-// FIXME: Corrigir extração, ERRO: zip header
-
 import { NextRequest, NextResponse } from "next/server";
 import path from "path";
 import fs from "fs-extra";
 import sqlite3 from "sqlite3";
-import JSZip, { file } from "jszip";
+import JSZip from "jszip";
 
 export async function POST(req = NextRequest()) {
   const jsonFile = await req.json();
@@ -12,7 +10,7 @@ export async function POST(req = NextRequest()) {
   if (!jsonFile) {
     return NextResponse.json(
       { error: "Nenhum arquivo JSON foi enviado!" },
-      { status: 400 }
+      { status: 400, statusText: "Nenhum arquivo JSON foi enviado!" }
     );
   }
 
@@ -34,7 +32,10 @@ export async function POST(req = NextRequest()) {
         reject(
           NextResponse.json(
             { error: `Erro ao criar o schema do banco de dados: ${err}` },
-            { status: 500 }
+            {
+              status: 500,
+              statusText: `Erro ao criar o schema do banco de dados: ${err}`,
+            }
           )
         );
       } else {
@@ -78,6 +79,9 @@ export async function POST(req = NextRequest()) {
                   "Content-Disposition": `attachment; filename="${filename}.apkg"`,
                   "X-Filename": filename,
                 },
+                status: 200,
+                statusText:
+                  "Arquivo exportado com sucesso! Iniciando download!",
               });
 
               resolve(response);
@@ -85,7 +89,10 @@ export async function POST(req = NextRequest()) {
               reject(
                 NextResponse.json(
                   { error: `Erro ao criar o arquivo .apkg: ${zipError}` },
-                  { status: 500 }
+                  {
+                    status: 500,
+                    statusText: `Erro ao criar o arquivo .apkg: ${zipError}`,
+                  }
                 )
               );
             }
