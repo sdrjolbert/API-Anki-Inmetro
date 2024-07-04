@@ -32,6 +32,10 @@ export async function GET() {
       },
       {
         "/api/deck/get-deck":
+          "Em GET para a recuperação de todos os decks de um determinado usuário de uma vez só",
+      },
+      {
+        "/api/deck/get-deck":
           "Em POST para a recuperação do deck em JSON do banco de dados para utilização dentro da aplicação",
       },
       {
