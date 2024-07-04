@@ -13,10 +13,14 @@ export async function GET(req = NextRequest()) {
 
     return NextResponse.json(
       {
+        ok: true,
         success: "Consulta realizada com sucesso no banco de dados!",
         user,
       },
-      { status: 200 }
+      {
+        status: 200,
+        statusText: "Consulta realizada com sucesso no banco de dados!",
+      }
     );
   } catch (error) {
     return NextResponse.json(
@@ -56,9 +60,13 @@ export async function POST(req = NextRequest()) {
 
     return NextResponse.json(
       {
+        ok: true,
         success: `Conta criada com sucesso com o username: ${user.username}`,
       },
-      { status: 201 }
+      {
+        status: 201,
+        statusText: `Conta criada com sucesso com o username: ${user.username}`,
+      }
     );
   } catch (error) {
     console.error("Erro ao criar usuário: ", error);
