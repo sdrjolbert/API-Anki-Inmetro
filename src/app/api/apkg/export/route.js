@@ -74,10 +74,10 @@ export async function POST(req = NextRequest()) {
                   "Content-Type": "application/zip",
                   "Content-Disposition": `attachment; filename="${filename}.apkg"`,
                   "X-Filename": filename,
-                  "X-Success":
-                    "Arquivo exportado com sucesso! Iniciando download!",
                 },
                 status: 200,
+                statusText:
+                  "Arquivo exportado com sucesso! Iniciando download!",
               });
 
               resolve(response);
