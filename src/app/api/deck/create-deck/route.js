@@ -1,3 +1,5 @@
+// FIXME: Funcionalidade de criação de decks não está funcionando!
+
 import { NextRequest, NextResponse } from "next/server";
 import { sql } from "@vercel/postgres";
 import moment from "moment-timezone";
