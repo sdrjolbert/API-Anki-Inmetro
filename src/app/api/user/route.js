@@ -1,27 +1,40 @@
 import { NextRequest, NextResponse } from "next/server";
 import { sql } from "@vercel/postgres";
+import TokenVerifier from "@/utils/verify-token/tokenVerifier";
 
 export async function GET(req = NextRequest()) {
   const bearerToken = req.headers.get("authorization");
   const token = bearerToken.split(" ")[1];
 
   try {
-    const { rows } =
-      await sql`SELECT userid, username, email FROM jwt_tokens WHERE token = ${token}`;
+    const { uid, username } = await TokenVerifier(token);
 
-    const user = rows[0];
+    try {
+      const { rows } =
+        await sql`SELECT email FROM jwt_tokens WHERE uid = ${uid} AND username = ${username} AND token = ${token}`;
 
+      const { email } = rows[0];
+
+      return NextResponse.json(
+        {
+          success: "Consulta realizada com sucesso no banco de dados!",
+          user: { uid, username, email },
+        },
+        { status: 200 }
+      );
+    } catch (err) {
+      return NextResponse.json(
+        { error: `Erro ao verificar banco de dados: ${err}` },
+        { status: 500, statusText: `Erro ao verificar banco de dados: ${err}` }
+      );
+    }
+  } catch (err) {
     return NextResponse.json(
+      { error: `Token inválido, expirado ou inexistente: ${err}` },
       {
-        success: "Consulta realizada com sucesso no banco de dados!",
-        user,
-      },
-      { status: 200 }
-    );
-  } catch (error) {
-    return NextResponse.json(
-      { error: "Erro ao verificar banco de dados" },
-      { status: 500, statusText: "Erro ao verificar banco de dados" }
+        status: 400,
+        statusText: `Token inválido, expirado ou inexistente: ${err}`,
+      }
     );
   }
 }

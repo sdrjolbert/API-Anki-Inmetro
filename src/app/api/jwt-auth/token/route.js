@@ -39,21 +39,22 @@ export async function POST(req = NextRequest()) {
     }
 
     const { rows: verifyIfUserHasToken } =
-      await sql`SELECT * FROM jwt_tokens WHERE userid = ${user.id} AND username = ${user.username} AND email = ${user.email}`;
+      await sql`SELECT * FROM jwt_tokens WHERE uid = ${user.id} AND username = ${user.username} AND email = ${user.email}`;
 
     if (verifyIfUserHasToken.length !== 0) {
-      await sql`DELETE FROM jwt_tokens WHERE userid = ${user.id} AND username = ${user.username} AND email = ${user.email}`;
+      await sql`DELETE FROM jwt_tokens WHERE uid = ${user.id} AND username = ${user.username} AND email = ${user.email}`;
     }
 
     const payload = {
       username: user.username,
       password: user.password,
     };
+
     const token = jwt.sign(payload, SECRET_KEY, { expiresIn: "1h" });
     const createdAt = moment().tz(TIMEZONE).format();
     const expiresAt = moment.unix(jwt.decode(token).exp).format();
 
-    await sql`INSERT INTO jwt_tokens ( userid, username, email, token, createdat, expiresat ) VALUES ( ${user.id}, ${user.username}, ${user.email}, ${token}, ${createdAt}, ${expiresAt} )`;
+    await sql`INSERT INTO jwt_tokens ( uid, username, email, token, createdat, expiresat ) VALUES ( ${user.id}, ${user.username}, ${user.email}, ${token}, ${createdAt}, ${expiresAt} )`;
 
     return NextResponse.json(
       {

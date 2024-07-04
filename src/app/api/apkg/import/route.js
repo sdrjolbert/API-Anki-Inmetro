@@ -3,34 +3,15 @@ import path from "path";
 import JSZip from "jszip";
 import fs from "fs-extra";
 import sqlite3 from "sqlite3";
-import jwt from "jsonwebtoken";
 import { sql } from "@vercel/postgres";
+import TokenVerifier from "@/utils/verify-token/tokenVerifier";
 
 export async function POST(req = NextRequest()) {
   const bearerToken = req.headers.get("authorization");
   const token = bearerToken.split(" ")[1];
 
   try {
-    const { username } = jwt.verify(token, process.env.JWT_SECRET);
-
-    const { rows: userSelect } =
-      await sql`SELECT id FROM users WHERE username = ${username}`;
-
-    if (userSelect.length > 1) {
-      return NextResponse.json(
-        {
-          error:
-            "Conflito no nome de usuário! Mais de um usuário com o mesmo nome de usuário",
-        },
-        {
-          status: 400,
-          error:
-            "Conflito no nome de usuário! Mais de um usuário com o mesmo nome de usuário",
-        }
-      );
-    }
-
-    const uid = userSelect[0].id;
+    const { uid, username } = TokenVerifier(token);
 
     const formData = await req.formData();
     const apkgFile = formData.get("apkg-file");
@@ -45,7 +26,7 @@ export async function POST(req = NextRequest()) {
     const filename = apkgFile.name.split(".apkg")[0];
 
     const { rows: decksRows } =
-      await sql`SELECT * FROM decks WHERE username = ${username} AND filename = ${filename}`;
+      await sql`SELECT id FROM decks WHERE username = ${username} AND filename = ${filename}`;
 
     if (decksRows.length > 0) {
       return NextResponse.json(
@@ -125,7 +106,6 @@ export async function POST(req = NextRequest()) {
     const outputDir = path.join(
       process.cwd(),
       "src",
-      "app",
       "utils",
       "decks",
       path.parse(apkgFile.name).name
@@ -177,8 +157,10 @@ export async function POST(req = NextRequest()) {
     }
   } catch (err) {
     return NextResponse.json(
-      { error: `Token expirado ou inexistente: ${err}` },
-      { status: 500, statusText: `Token expirado ou inexistente: ${err}` }
+      {
+        error: `Não foi possível importar: ${err}`,
+      },
+      { status: 500, statusText: `Não foi possível importar: ${err}` }
     );
   }
 }

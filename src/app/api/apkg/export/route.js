@@ -5,18 +5,14 @@ import sqlite3 from "sqlite3";
 import JSZip from "jszip";
 
 export async function POST(req = NextRequest()) {
-  const jsonFile = await req.json();
+  const { jsonData, filename } = await req.json();
 
-  if (!jsonFile) {
+  if (!jsonData) {
     return NextResponse.json(
       { error: "Nenhum arquivo JSON foi enviado!" },
       { status: 400, statusText: "Nenhum arquivo JSON foi enviado!" }
     );
   }
-
-  const filename = JSON.parse(jsonFile.col[0].decks)[
-    Object.keys(JSON.parse(jsonFile.col[0].decks))[1]
-  ].name.replaceAll(" ", "_");
 
   const dbPath = path.join(process.cwd(), "collection.anki21");
 
@@ -40,7 +36,7 @@ export async function POST(req = NextRequest()) {
         );
       } else {
         const insertData = () => {
-          const { cards, col, graves, notes, revlog } = jsonFile;
+          const { cards, col, graves, notes, revlog } = jsonData;
 
           const insert = (table, rows) => {
             if (rows && rows.length) {
@@ -78,10 +74,10 @@ export async function POST(req = NextRequest()) {
                   "Content-Type": "application/zip",
                   "Content-Disposition": `attachment; filename="${filename}.apkg"`,
                   "X-Filename": filename,
+                  "X-Success":
+                    "Arquivo exportado com sucesso! Iniciando download!",
                 },
                 status: 200,
-                statusText:
-                  "Arquivo exportado com sucesso! Iniciando download!",
               });
 
               resolve(response);
