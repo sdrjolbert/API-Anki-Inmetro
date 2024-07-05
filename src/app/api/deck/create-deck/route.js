@@ -45,20 +45,32 @@ export async function POST(req = NextRequest()) {
   try {
     const { id: uid, username } = await TokenVerifier(token);
 
-    const { rows: insertReturn } = await sql`
-        INSERT INTO decks (uid, username, filename, json)
-        VALUES (${uid}, ${username}, ${filename}, ${newDeck})
-        RETURNING *
-      `;
+    try {
+      const { rows: insertReturn } = await sql`
+          INSERT INTO decks (uid, username, filename, json)
+          VALUES (${uid}, ${username}, ${filename}, ${newDeck})
+          RETURNING *
+        `;
 
-    const user = insertReturn[0];
+      const user = insertReturn[0];
 
-    return NextResponse.json(
-      {
-        success: `O deck ${filename} foi criado com sucesso pelo usuário ${user.username}`,
-      },
-      { status: 200 }
-    );
+      return NextResponse.json(
+        {
+          success: `O deck ${filename} foi criado com sucesso pelo usuário ${user.username}`,
+        },
+        { status: 200 }
+      );
+    } catch (err) {
+      return NextResponse.json(
+        {
+          error: `Não foi possível inserir os dados no banco de dados: ${err}`,
+        },
+        {
+          status: 400,
+          statusText: `Não foi possível inserir os dados no banco de dados: ${err}`,
+        }
+      );
+    }
   } catch (err) {
     return NextResponse.json(
       { error: `Token inválido, expirado ou inexistente: ${err}` },

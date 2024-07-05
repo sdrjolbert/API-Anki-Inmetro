@@ -10,7 +10,11 @@ const nextConfig = {
             value: "Content-Disposition, X-Filename",
           },
           { key: "Access-Control-Allow-Credentials", value: "true" },
-          { key: "Access-Control-Allow-Origin", value: "*" },
+          {
+            key: "Access-Control-Allow-Origin",
+            value:
+              "https://anki-inmetro.vercel.app, https://teste-ankijr-inmetro.vercel.app, https://api-anki-inmetro.vercel.app, http://localhost:3000, http://localhost:5173",
+          },
           {
             key: "Access-Control-Allow-Methods",
             value: "GET,OPTIONS,PATCH,DELETE,POST,PUT",
@@ -29,16 +33,6 @@ const nextConfig = {
       {
         source: "/",
         destination: "/api/rotas",
-        permanent: true,
-      },
-      {
-        source: "/api/apkg/",
-        destination: "/api/apkg/import",
-        permanent: true,
-      },
-      {
-        source: "/api/deck/",
-        destination: "/api/apkg/get-deck",
         permanent: true,
       },
     ];

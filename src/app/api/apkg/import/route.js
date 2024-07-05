@@ -11,7 +11,7 @@ export async function POST(req = NextRequest()) {
   const token = bearerToken.split(" ")[1];
 
   try {
-    const { uid, username } = TokenVerifier(token);
+    const { id: uid, username } = await TokenVerifier(token);
 
     const formData = await req.formData();
     const apkgFile = formData.get("apkg-file");

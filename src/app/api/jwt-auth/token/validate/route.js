@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import moment from "moment-timezone";
 import { sql } from "@vercel/postgres";
+import TokenVerifier from "@/utils/verify-token/tokenVerifier";
 
 const TIMEZONE = "America/Sao_Paulo";
 
@@ -11,6 +12,8 @@ export async function POST(req = NextRequest()) {
   const token = bearerToken.split(" ")[1];
 
   try {
+    const { username } = await TokenVerifier(token);
+
     const { rows } = await sql`SELECT * FROM jwt_tokens WHERE token = ${token}`;
 
     const expiresAt = moment(rows[0].expiresat).tz(TIMEZONE).format();
@@ -30,7 +33,7 @@ export async function POST(req = NextRequest()) {
 
     return NextResponse.json(
       {
-        success: "Token válido!",
+        success: `O token do usuário ${username} é válido!`,
       },
       { status: 200 }
     );
