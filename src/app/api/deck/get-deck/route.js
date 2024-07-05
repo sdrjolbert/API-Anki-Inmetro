@@ -6,7 +6,7 @@ export async function GET(req = NextRequest()) {
   const bearerToken = req.headers.get("authorization");
   const token = bearerToken.split(" ")[1];
 
-  if (!token) {
+  if (!bearer || !token) {
     return NextResponse.json(
       { error: "Token de autorização não fornecido!" },
       { status: 401, statusText: "Token de autorização não fornecido!" }
