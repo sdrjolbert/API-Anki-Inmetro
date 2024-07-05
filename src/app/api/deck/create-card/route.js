@@ -82,8 +82,6 @@ export async function POST(req = NextRequest()) {
           }
         );
 
-        const { due } = response.data;
-
         const card = {
           id: epochInMs,
           nid: epochInMs,
@@ -93,7 +91,7 @@ export async function POST(req = NextRequest()) {
           usn: -1,
           type: 0,
           queue: 0,
-          due: due + 1,
+          due: 1,
           ivl: 0,
           factor: 2500,
           reps: 0,
