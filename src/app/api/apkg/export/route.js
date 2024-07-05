@@ -34,11 +34,11 @@ export async function POST(req = NextRequest()) {
 
     const { jsonData } = response.data;
 
-    const dbPath = path.join(process.cwd(), "collection.anki21");
+    const dbPath = path.join("/tmp", "collection.anki21");
 
     const db = new sqlite3.Database(dbPath);
 
-    const schemaPath = path.join(process.cwd(), "schema.sql");
+    const schemaPath = path.join("/tmp", "schema.sql");
     const schemaSql = fs.readFileSync(schemaPath, "utf-8");
 
     return new Promise((resolve, reject) => {
