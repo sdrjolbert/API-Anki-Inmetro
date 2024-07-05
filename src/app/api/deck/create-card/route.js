@@ -145,11 +145,11 @@ export async function POST(req = NextRequest()) {
       } catch (err) {
         return NextResponse.json(
           {
-            error: `Não foi possível recuperar o maior due atual do deck: ${err}`,
+            error: `Não foi possível recuperar o maior due atual do deck: ${err.response.statusText}`,
           },
           {
             status: 400,
-            statusText: `Não foi possível recuperar o maior due atual do deck: ${err}`,
+            statusText: `Não foi possível recuperar o maior due atual do deck: ${err.response.statusText}`,
           }
         );
       }
