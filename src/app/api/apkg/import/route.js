@@ -105,8 +105,6 @@ export async function POST(req = NextRequest()) {
     const fileBuffer = await apkgFile.arrayBuffer();
     const outputDir = path.join(
       process.cwd(),
-      "src",
-      "utils",
       "decks",
       path.parse(apkgFile.name).name
     );
