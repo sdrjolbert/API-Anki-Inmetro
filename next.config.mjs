@@ -12,8 +12,7 @@ const nextConfig = {
           { key: "Access-Control-Allow-Credentials", value: "true" },
           {
             key: "Access-Control-Allow-Origin",
-            value:
-              "https://anki-inmetro.vercel.app, https://teste-ankijr-inmetro.vercel.app, https://api-anki-inmetro.vercel.app, http://localhost:3000, http://localhost:5173",
+            value: "*",
           },
           {
             key: "Access-Control-Allow-Methods",
