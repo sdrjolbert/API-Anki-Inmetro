@@ -28,8 +28,12 @@ export async function POST(req = NextRequest()) {
     if (cards.length === 0) {
       return NextResponse.json(
         {
-          error:
+          success:
             "Ainda não há cards nesse deck, crie cards para poder recuperá-los",
+          cards: [],
+          due: 136,
+          due2: 1639,
+          sortedCards: [],
         },
         {
           status: 500,
@@ -37,54 +41,54 @@ export async function POST(req = NextRequest()) {
             "Ainda não há cards nesse deck, crie cards para poder recuperá-los",
         }
       );
-    }
+    } else {
+      const maxDueType0 = cards
+        .filter((card) => card.type === 0)
+        .reduce(
+          (max, current) => {
+            return current.due > max.due ? current : max;
+          },
+          { due: 0 }
+        ).due;
 
-    const maxDueType0 = cards
-      .filter((card) => card.type === 0)
-      .reduce(
-        (max, current) => {
-          return current.due > max.due ? current : max;
-        },
-        { due: 0 }
-      ).due;
+      const maxDueType2 = cards
+        .filter((card) => card.type === 2)
+        .reduce(
+          (max, current) => {
+            return current.due > max.due ? current : max;
+          },
+          { due: 135 }
+        ).due;
 
-    const maxDueType2 = cards
-      .filter((card) => card.type === 2)
-      .reduce(
-        (max, current) => {
-          return current.due > max.due ? current : max;
-        },
-        { due: 135 }
-      ).due;
-
-    const sortedCards = [...cards].sort((a, b) => {
-      if (a.type === 0 && b.type === 0) {
-        return a.due - b.due;
-      } else if (a.type === 1 && b.type === 1) {
-        return a.due - b.due;
-      } else if (a.type === 0) {
-        return -1;
-      } else if (a.type === 1) {
-        return b.type === 0 ? 1 : -1;
-      } else {
-        if (b.type === 0 || b.type === 1) {
-          return 1;
+      const sortedCards = [...cards].sort((a, b) => {
+        if (a.type === 0 && b.type === 0) {
+          return a.due - b.due;
+        } else if (a.type === 1 && b.type === 1) {
+          return a.due - b.due;
+        } else if (a.type === 0) {
+          return -1;
+        } else if (a.type === 1) {
+          return b.type === 0 ? 1 : -1;
         } else {
-          return a.ivl - b.ivl;
+          if (b.type === 0 || b.type === 1) {
+            return 1;
+          } else {
+            return a.ivl - b.ivl;
+          }
         }
-      }
-    });
+      });
 
-    return NextResponse.json(
-      {
-        success: `Cards do deck ${filename} do usuário ${username} recuperados com sucesso!`,
-        cards,
-        due: maxDueType0,
-        due2: maxDueType2,
-        sortedCards,
-      },
-      { status: 200 }
-    );
+      return NextResponse.json(
+        {
+          success: `Cards do deck ${filename} do usuário ${username} recuperados com sucesso!`,
+          cards,
+          due: maxDueType0,
+          due2: maxDueType2,
+          sortedCards,
+        },
+        { status: 200 }
+      );
+    }
   } catch (err) {
     return NextResponse.json(
       { error: `Não foi possível recuperar os cards do usuário: ${err}` },
