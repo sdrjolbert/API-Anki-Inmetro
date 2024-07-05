@@ -28,12 +28,8 @@ export async function POST(req = NextRequest()) {
     if (cards.length === 0) {
       return NextResponse.json(
         {
-          success:
+          error:
             "Ainda não há cards nesse deck, crie cards para poder recuperá-los",
-          cards: [],
-          due: 136,
-          due2: 1639,
-          sortedCards: [],
         },
         {
           status: 500,
