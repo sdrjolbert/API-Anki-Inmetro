@@ -17,7 +17,7 @@ export async function POST(req = NextRequest()) {
 
     try {
       const response = await axios.post(
-        "http://localhost:4444/api/deck/get-cards",
+        "https://api-anki-inmetro.vercel.app/api/deck/get-cards",
         deckName,
         {
           headers: {

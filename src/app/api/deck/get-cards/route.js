@@ -11,7 +11,7 @@ export async function POST(req = NextRequest()) {
     const { username } = await TokenVerifier(token);
 
     const response = await axios.post(
-      "http://localhost:4444/api/deck/get-deck",
+      "https://api-anki-inmetro.vercel.app/api/deck/get-deck",
       filename,
       {
         headers: {
